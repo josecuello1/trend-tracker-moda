@@ -6,3 +6,4 @@ privacy-site/.vercel/
 __pycache__/
 *.pyc
 .DS_Store
+logs/
