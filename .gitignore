@@ -1,0 +1,8 @@
+.env
+.env.local
+scripts/.env
+pinterest-moodboard-privado/
+privacy-site/.vercel/
+__pycache__/
+*.pyc
+.DS_Store

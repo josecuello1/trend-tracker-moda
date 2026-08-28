@@ -1,0 +1,700 @@
+
+<title>Radar de Tendencias</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #f2f2ef;
+    --surface: #ffffff;
+    --surface-2: #eaeae6;
+    --ink: #0e0e10;
+    --ink-2: #47474a;
+    --ink-muted: #86868a;
+    --rule: #dcdcd7;
+    --accent: #2f5bff;       /* electric blue */
+    --accent-strong: #1c3fc9;
+    --rust: #2f5bff;         /* alias used for "pasarela" pill */
+    --cherry: #ff2d78;       /* hot pink/magenta — primary pop */
+    --cherry-text: #c81760;  /* darkened for small text on tint (AA) */
+    --cherry-soft: rgba(255,45,120,0.12);
+    --lime: #c6ff3d;         /* acid lime — secondary pop */
+    --lime-ink: #0e0e10;
+
+    --s1: #2a78d6; --s1d:#3987e5; /* Color */
+    --s2: #eb6834; --s2d:#d95926; /* Silueta */
+    --s3: #1baf7a; --s3d:#199e70; /* Textura */
+    --s4: #eda100; --s4d:#c98500; /* Prenda */
+    --s5: #e87ba4; --s5d:#d55181; /* Accesorio */
+    --s6: #008300; --s6d:#008300; /* Calzado */
+
+    --shadow: 0 1px 2px rgba(14,14,16,0.08), 0 10px 28px -14px rgba(14,14,16,0.28);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0e0e10;
+      --surface: #19191c;
+      --surface-2: #232327;
+      --ink: #f5f5f2;
+      --ink-2: #c9c9cc;
+      --ink-muted: #8f8f94;
+      --rule: #2c2c31;
+      --accent: #6a8bff;
+      --accent-strong: #a9bcff;
+      --rust: #6a8bff;
+      --cherry: #ff5b93;
+      --cherry-text: #ff8fb3;
+      --cherry-soft: rgba(255,91,147,0.16);
+      --lime: #d4ff5e;
+      --lime-ink: #0e0e10;
+      --s1: #3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#4fbf4f;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 32px -14px rgba(0,0,0,0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #0e0e10; --surface: #19191c; --surface-2: #232327;
+    --ink: #f5f5f2; --ink-2: #c9c9cc; --ink-muted: #8f8f94; --rule: #2c2c31;
+    --accent: #6a8bff; --accent-strong: #a9bcff; --rust: #6a8bff;
+    --cherry: #ff5b93; --cherry-text: #ff8fb3; --cherry-soft: rgba(255,91,147,0.16);
+    --lime: #d4ff5e; --lime-ink: #0e0e10;
+    --s1: #3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#4fbf4f;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 32px -14px rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Work Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:2.75rem 1.5rem 5rem;
+  }
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace;}
+  .display{font-family:"Bebas Neue", "Work Sans", sans-serif;}
+
+  /* ---- Header (deliberately always-dark masthead, poster-style) ---- */
+  header.top{
+    background:#0e0e10; color:#f5f5f2;
+    margin:-2.75rem -1.5rem 2.25rem; padding:2.4rem 1.5rem 2.1rem;
+    display:flex; flex-direction:column; gap:0.7rem;
+    border-bottom:3px solid var(--cherry);
+  }
+  .eyebrow-row{
+    display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--lime); font-weight:700;
+  }
+  .badge{
+    font-size:0.68rem; letter-spacing:0.03em; font-family:"IBM Plex Mono",monospace;
+    color:#0e0e10; background:var(--lime);
+    padding:0.18rem 0.55rem; border-radius:100px; font-weight:600;
+  }
+  .badge.alt{ background:#c81760; color:#fff; }
+  h1{
+    font-family:"Bebas Neue", "Work Sans", sans-serif;
+    font-weight:400; font-size:clamp(3rem, 8vw, 5.2rem); line-height:0.92;
+    margin:0; letter-spacing:0.01em; text-wrap:balance; color:#fff;
+  }
+  .sub{
+    max-width:56ch; color:#c9c9cc; font-size:0.98rem; margin:0.2rem 0 0;
+  }
+
+  /* ---- Stat row ---- */
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--rule); border:1px solid var(--rule);
+    border-radius:10px; overflow:hidden; margin-bottom:2.25rem;
+  }
+  .stat{
+    background:var(--surface); padding:1.15rem 1.2rem;
+    display:flex; flex-direction:column; gap:0.3rem;
+  }
+  .stat .label{
+    font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--ink-muted); font-weight:600;
+  }
+  .stat .value{
+    font-family:"IBM Plex Mono", monospace; font-size:1.55rem; font-weight:500;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat .value small{font-size:0.85rem; color:var(--ink-muted); font-weight:400;}
+  .stat .note{font-size:0.78rem; color:var(--ink-muted);}
+
+  @media (max-width:760px){ .stats{grid-template-columns:repeat(2,1fr);} }
+
+  /* ---- Section shell ---- */
+  section{margin-bottom:2.5rem;}
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:1rem; margin-bottom:1rem; flex-wrap:wrap;
+  }
+  h2{
+    font-family:"Bebas Neue", "Work Sans", sans-serif; font-weight:400;
+    font-size:1.9rem; margin:0; letter-spacing:0.015em; line-height:1;
+  }
+  .section-note{font-size:0.82rem; color:var(--ink-muted); margin:0;}
+
+  /* ---- Regional insight ---- */
+  .insight-grid{
+    display:grid; grid-template-columns:1.4fr 1fr; gap:1px;
+    background:var(--rule); border:1px solid var(--rule); border-radius:10px; overflow:hidden;
+  }
+  .insight-col{background:var(--surface); padding:1.3rem 1.4rem;}
+  .insight-col h3{
+    margin:0 0 0.9rem; font-size:0.85rem; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--ink-2); display:flex; align-items:center; gap:0.5rem;
+  }
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none;}
+  .dot.olive{background:var(--accent);}
+  .dot.cherry{background:var(--cherry);}
+  .dot.lime{background:var(--lime); border:1px solid var(--rule);}
+  .trend-row.validated .rec-bar i{background:var(--accent);}
+  .tag-src{
+    display:block; font-size:0.72rem; color:var(--ink-muted); margin-top:0.1rem;
+    font-family:"IBM Plex Mono", monospace;
+  }
+  .stat{border-top:3px solid var(--accent);}
+  .stat:nth-child(2){border-top-color:var(--cherry);}
+  .stat:nth-child(3){border-top-color:var(--lime);}
+  .stat:nth-child(4){border-top-color:var(--accent);}
+  .trend-row{
+    display:flex; align-items:center; gap:0.75rem; padding:0.55rem 0;
+    border-top:1px solid var(--rule);
+  }
+  .trend-row:first-of-type{border-top:none;}
+  .trend-row .name{flex:1; font-size:0.9rem;}
+  .rec-bar{
+    width:64px; height:6px; border-radius:3px; background:var(--surface-2);
+    position:relative; flex:none; overflow:hidden;
+  }
+  .rec-bar i{
+    position:absolute; inset:0 auto 0 0; border-radius:3px; display:block;
+    background:var(--accent);
+  }
+  .trend-row.regional .rec-bar i{background:var(--cherry);}
+  .rec-num{
+    font-family:"IBM Plex Mono",monospace; font-size:0.78rem; color:var(--ink-muted);
+    width:2ch; text-align:right; flex:none;
+  }
+  @media (max-width:720px){ .insight-grid{grid-template-columns:1fr;} }
+
+  /* ---- Filter bar ---- */
+  .filter-bar{
+    display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap;
+    background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+    padding:0.85rem 1.1rem; margin-bottom:1.25rem;
+  }
+  .filter-bar label{
+    display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:var(--ink-2); font-weight:600;
+  }
+  .filter-bar select{
+    font-family:"Work Sans", sans-serif; font-size:0.85rem; color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--rule); border-radius:6px;
+    padding:0.35rem 0.6rem; cursor:pointer;
+  }
+  .filter-bar select:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  .filter-bar button{
+    font-family:"Work Sans", sans-serif; font-size:0.8rem; font-weight:600; color:var(--cherry-text);
+    background:none; border:1px solid var(--cherry); border-radius:6px; padding:0.35rem 0.7rem; cursor:pointer;
+  }
+  .filter-bar button:hover{ background:var(--cherry-soft); }
+  @media (max-width:640px){ .filter-bar span{margin-left:0 !important; width:100%;} }
+
+  /* ---- Charts ---- */
+  .chart-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:1.25rem;
+  }
+  @media (max-width:760px){ .chart-grid{grid-template-columns:1fr;} }
+  .chart-card{
+    background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+    padding:1.25rem 1.35rem 1rem;
+  }
+  .chart-card h3{
+    margin:0 0 1rem; font-size:0.88rem; font-weight:600; color:var(--ink);
+  }
+  .barlist{display:flex; flex-direction:column; gap:0.65rem;}
+  .barrow{display:grid; grid-template-columns:98px 1fr 2.4ch; align-items:center; gap:0.65rem;}
+  .barrow .blabel{font-size:0.8rem; color:var(--ink-2); text-align:right;}
+  .btrack{
+    height:14px; background:var(--surface-2); border-radius:3px; position:relative;
+    border:1px solid var(--rule);
+  }
+  .bfill{
+    position:absolute; top:0; bottom:0; left:0; border-radius:2px 3px 3px 2px;
+    min-width:4px; cursor:default;
+  }
+  .barrow .bval{font-family:"IBM Plex Mono",monospace; font-size:0.78rem; color:var(--ink-muted); font-variant-numeric:tabular-nums;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:0.6rem 1rem; margin-top:1rem; padding-top:0.85rem; border-top:1px solid var(--rule);}
+  .legend span{display:flex; align-items:center; gap:0.4rem; font-size:0.74rem; color:var(--ink-muted);}
+  .legend i{width:9px; height:9px; border-radius:2px; display:inline-block;}
+
+  /* tooltip */
+  [data-tip]{position:relative;}
+  [data-tip]:hover::after{
+    content:attr(data-tip);
+    position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--surface); font-size:0.72rem; font-family:"IBM Plex Mono",monospace;
+    padding:0.3rem 0.5rem; border-radius:5px; white-space:nowrap; box-shadow:var(--shadow);
+    z-index:5; pointer-events:none;
+  }
+  [data-tip]:hover::before{
+    content:""; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%);
+    border:4px solid transparent; border-top-color:var(--ink); z-index:5; pointer-events:none;
+  }
+
+  /* ---- Table ---- */
+  .table-scroll{overflow-x:auto; border:1px solid var(--rule); border-radius:10px; background:var(--surface);}
+  table{width:100%; border-collapse:collapse; font-size:0.85rem; min-width:720px;}
+  thead th{
+    text-align:left; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--ink-muted); font-weight:600; padding:0.7rem 0.9rem; border-bottom:1px solid var(--rule);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:0.65rem 0.9rem; border-bottom:1px solid var(--rule); vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--surface-2);}
+  .chip{
+    display:inline-block; font-size:0.72rem; padding:0.12rem 0.5rem; border-radius:100px;
+    background:var(--surface-2); color:var(--ink-2); border:1px solid var(--rule); margin:0 0.2rem 0.2rem 0;
+    white-space:nowrap;
+  }
+  .pill{
+    display:inline-block; font-size:0.72rem; padding:0.15rem 0.55rem; border-radius:100px;
+    font-weight:600; white-space:nowrap;
+  }
+  .pill.pasarela{background:rgba(47,91,255,0.12); color:var(--accent-strong);}
+  .pill.calle{background:var(--cherry-soft); color:var(--cherry-text);}
+  .pill.actual{background:var(--surface-2); color:var(--ink-muted); border:1px solid var(--rule);}
+  .pill.pronostico{background:none; color:var(--cherry-text); border:1px dashed var(--cherry);}
+  td.rec{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
+  .mini-rec{display:flex; align-items:center; gap:0.4rem;}
+  .mini-rec .track{width:40px; height:5px; border-radius:3px; background:var(--surface-2); position:relative; border:1px solid var(--rule);}
+  .mini-rec .track i{position:absolute; inset:0 auto 0 0; background:var(--accent); border-radius:2px;}
+  a.src{color:var(--ink-muted); text-decoration:none;}
+  a.src:hover{color:var(--accent-strong); text-decoration:underline;}
+
+  /* ---- Notes callout ---- */
+  .notes{
+    border:2px dashed var(--cherry); border-radius:10px; padding:1.3rem 1.4rem;
+    background:var(--surface-2);
+  }
+  .notes h2{font-size:1.1rem;}
+  .notes ul{margin:0.6rem 0 0; padding-left:1.2rem; display:flex; flex-direction:column; gap:0.5rem;}
+  .notes li{font-size:0.9rem; color:var(--ink-2);}
+  .notes li b{color:var(--ink);}
+
+  footer{
+    margin-top:2.5rem; padding-top:1.25rem; border-top:1px solid var(--rule);
+    font-size:0.78rem; color:var(--ink-muted); display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow-row">
+      <span class="eyebrow">Trend Intelligence · Jose Cuello</span>
+      <span class="badge">borrador · v1</span>
+      <span class="badge alt">38 entradas · pasarela + calle + búsqueda · 28 jul 2026 – SS 2027</span>
+    </div>
+    <h1>Radar de Tendencias</h1>
+    <p class="sub">Así estoy leyendo lo que llevas cargado del tracker hasta ahora. Es un boceto — la idea es que reacciones a cómo lo agrupé y lo que resalté, para ajustarlo a lo que tú te imaginas.</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="label">Tendencias registradas</span>
+      <span class="value">38</span>
+      <span class="note">35 actuales · 3 pronóstico SS27</span>
+    </div>
+    <div class="stat">
+      <span class="label">Recurrencia promedio</span>
+      <span class="value">3.4 <small>/ 5</small></span>
+      <span class="note">sube con las confirmaciones de búsqueda</span>
+    </div>
+    <div class="stat">
+      <span class="label">Los 3 niveles, cubiertos</span>
+      <span class="value" style="font-size:1.1rem;">28 · 1 · 9</span>
+      <span class="note">pasarela · calle · búsqueda</span>
+    </div>
+    <div class="stat">
+      <span class="label">Validado por demanda</span>
+      <span class="value">03</span>
+      <span class="note">pasarela y búsqueda coinciden</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <h2>Confirmado a nivel global</h2>
+      <p class="section-note">Aparece en 2+ regiones o continentes de forma independiente</p>
+    </div>
+    <div class="insight-grid" style="grid-template-columns:1fr;">
+      <div class="insight-col">
+        <h3><span class="dot olive"></span>Ya no es solo LatAm — ni solo Europa</h3>
+        <div class="trend-row"><span class="name">Cuero y pieles como material protagonista</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Sastrería masculina en moda femenina (corbatas, solapas)</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Volumen y sobretalla</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Flecos</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Paleta fría industrial (Copenhague + Argentina)</span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <div class="trend-row"><span class="name">Denim deconstruido (Tokio + Lagos)</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Cuero: Vogue Runway + Buenos Aires + Milán + París + Londres + Copenhague. Flecos: São Paulo + Nueva York + Lagos. Sastrería masculina: Grazia LatAm + Milán. Volumen: México + São Paulo + Milán + Lagos. Denim deconstruido: Tokio + Lagos, sin relación editorial entre sí. Cuando algo se repite en fuentes que no se leen entre sí, ahí es donde más confío en la señal.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Pasarela vs. demanda real</h2>
+      <p class="section-note">Datos de búsqueda de Google · primavera 2026</p>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-col">
+        <h3><span class="dot lime"></span>La pasarela lo dijo — y la gente lo está buscando</h3>
+        <div class="trend-row validated"><span class="name">Joyería chunky <span class="tag-src">Colombiamoda → máx. histórico</span></span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row validated"><span class="name">Pañuelos de seda <span class="tag-src">París + Medellín → máx. histórico</span></span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <div class="trend-row validated"><span class="name">Calzado plano y kitten heel <span class="tag-src">Copenhague → máx. 5 años</span></span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Estas tres son las apuestas más seguras del tracker: no solo se anunciaron en pasarela, el consumidor ya las está buscando. Si vas a hablar de una sola tendencia con confianza, que sea de aquí.</p>
+      </div>
+      <div class="insight-col">
+        <h3><span class="dot cherry"></span>Brecha: demanda sin pasarela</h3>
+        <div class="trend-row regional"><span class="name">Lunares / polka dots <span class="tag-src">máx. histórico, sin eco en las 8 ciudades</span></span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row regional"><span class="name">Pantalón capri / tobillero <span class="tag-src">máx. histórico, contradice el largo de pasarela</span></span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Lo que la gente busca y la pasarela no está liderando. Aquí es donde hay espacio para decir algo que nadie más está diciendo — y el capri incluso contradice las siluetas largas de las pasarelas que cubrimos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Atención real — Wikipedia</h2>
+      <p class="section-note">Wikimedia Pageviews · últimos 12 meses</p>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-col">
+        <h3><span class="dot olive"></span>El primer conteo estaba mal — 9x mal</h3>
+        <div class="trend-row validated"><span class="name">Balenciaga (la marca) <span class="tag-src">3.967 → 36.906 vistas/año al resolver el artículo correcto</span></span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">"Balenciaga" a secas en Wikipedia en español es la página del diseñador Cristóbal Balenciaga, no la casa de moda — medir ese título subestimaba la atención real a la marca 9 veces. El artículo correcto es "Balenciaga (empresa)". Lección para cualquier medición de atención por nombre propio: el título más obvio no siempre es el correcto.</p>
+      </div>
+      <div class="insight-col">
+        <h3><span class="dot cherry"></span>Brecha de cobertura en español</h3>
+        <div class="trend-row regional"><span class="name">Streetwear / Y2K / vintage <span class="tag-src">sin artículo propio en es.wikipedia todavía</span></span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Estos tres términos sí tienen artículo (y tráfico real) en en.wikipedia, pero la Wikipedia en español todavía no les dedicó una entrada propia. No es que no haya interés — es que la cobertura editorial en español no llegó ahí. Si vas a hablar de streetwear o Y2K en español, hoy no hay dato de Wikipedia ES con que respaldarlo, aunque sí lo hay en inglés.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Lectura regional — LatAm, 2026</h2>
+      <p class="section-note">México / Colombia / Brasil / Argentina</p>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-col">
+        <h3><span class="dot olive"></span>Transversal en la región</h3>
+        <div class="trend-row"><span class="name">Paleta tierra (musgo, oliva, arena, chocolate)</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Volumen y sobretalla</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Vintage / segunda mano</span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <div class="trend-row"><span class="name">Accesorios statement</span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+      </div>
+      <div class="insight-col">
+        <h3><span class="dot cherry"></span>Particular por país</h3>
+        <div class="trend-row regional"><span class="name">Brasil — transparencias, flecos, metalizados</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row regional"><span class="name">Argentina — cuero y capas (denim/gamuza)</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row regional"><span class="name">Argentina — paleta fría (obsidiana, cemento, jade)</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Brasil se va a lo expresivo/embellecido; Argentina va a lo frío/industrial. Ninguna de las dos es "toda LatAm" — por eso quedan separadas de lo transversal.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Lo que cada capital ve distinto</h2>
+      <p class="section-note">Aún sin cruzar a otras ciudades del tracker</p>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-col">
+        <h3><span class="dot cherry"></span>Europa / Norteamérica</h3>
+        <div class="trend-row regional"><span class="name">París + Londres — púrpura real</span><div class="rec-bar" data-tip="Recurrencia 4/5"><i style="width:80%"></i></div><span class="rec-num">4</span></div>
+        <div class="trend-row regional"><span class="name">Milán — mostaza y verde menta</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row regional"><span class="name">Londres — cuellos isabelinos, "full sweep"</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <div class="trend-row regional"><span class="name">Nueva York — animal print, grunge/indie sleaze</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row regional"><span class="name">Copenhague — calzado práctico (zuecos, botas)</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+      </div>
+      <div class="insight-col">
+        <h3><span class="dot cherry"></span>Asia / África</h3>
+        <div class="trend-row regional"><span class="name">Tokio — streetwear utilitario-técnico</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <div class="trend-row regional"><span class="name">Seúl — reconstrucción con materiales alternativos</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <div class="trend-row regional"><span class="name">Lagos — rafia, cauríes y crochet estructural</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <div class="trend-row regional"><span class="name">Lagos — textiles espejados</span><div class="rec-bar" data-tip="Recurrencia 1/5"><i style="width:20%"></i></div><span class="rec-num">1</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">Dato curioso: mientras LatAm cubrió la temporada en clave tierra/sobria, las capitales europeas y norteamericana se fueron más a color y nostalgia — y Lagos aportó algo que ninguna otra ciudad tiene: identidad cultural propia (rafia, cauríes) en vez de una variación de lo mismo.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Lo que viene — pronóstico SS 2027</h2>
+      <p class="section-note">Aún no llega · forecasters de color e industria</p>
+    </div>
+    <div class="insight-grid" style="grid-template-columns:1fr;">
+      <div class="insight-col" style="border:1px dashed var(--cherry);">
+        <h3><span class="dot cherry"></span>Señales tempranas, no confirmadas en calle todavía</h3>
+        <div class="trend-row"><span class="name">Azul luminoso — Color of the Year 2027 (Coloro)</span><div class="rec-bar" data-tip="Recurrencia 5/5"><i style="width:100%"></i></div><span class="rec-num">5</span></div>
+        <div class="trend-row"><span class="name">Neutros cálidos ampliados (terracota, arena, café)</span><div class="rec-bar" data-tip="Recurrencia 3/5"><i style="width:60%"></i></div><span class="rec-num">3</span></div>
+        <div class="trend-row"><span class="name">Metálicos como acabado de tela (Lurex, laminado)</span><div class="rec-bar" data-tip="Recurrencia 2/5"><i style="width:40%"></i></div><span class="rec-num">2</span></div>
+        <p class="section-note" style="margin-top:0.9rem;">El dato interesante: los neutros cálidos de SS27 refuerzan la paleta tierra que ya ves hoy en México/Colombia — si se cumple, ese eje de color te dura al menos una temporada más.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Cómo se distribuye lo registrado</h2>
+      <p class="section-note" id="filter-count">Sobre las 29 entradas del tracker</p>
+    </div>
+
+    <div class="filter-bar">
+      <label>Región
+        <select id="filter-region"><option value="Todas">Todas</option></select>
+      </label>
+      <label>Ciudad
+        <select id="filter-city"><option value="Todas">Todas</option></select>
+      </label>
+      <button id="filter-reset" type="button">Quitar filtros</button>
+      <span class="section-note" style="margin-left:auto;">Los filtros aplican a los gráficos y a la tabla — el resto del análisis de arriba queda fijo.</span>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Por categoría de análisis</h3>
+        <div class="barlist" id="chart-cat"></div>
+        <div class="legend" id="legend-cat"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Por etapa del ciclo</h3>
+        <div class="barlist" id="chart-stage"></div>
+        <div class="legend" id="legend-stage"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Registro completo</h2>
+      <p class="section-note">Ordenado por recurrencia — de la señal más fuerte a la más nueva</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Tendencia / elemento</th><th>Categoría</th><th>Etapa</th><th>Temporalidad</th><th>Fuente</th><th>Región</th><th>Ciudad</th><th>Fecha</th><th>Recurrencia</th></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>Notas de interpretación — para que ajustes</h2>
+    <ul>
+      <li><b>Traté "recurrencia" como el eje central de importancia</b> — es lo que ordena la tabla y define qué se destaca arriba. Si para ti otra cosa pesa más (por ejemplo la etapa o la fuente), lo reacomodo.</li>
+      <li><b>Separé "transversal" de "particular por país"</b> asumiendo que te interesa saber cuándo algo aplica a toda la región vs. solo un país (ahora con Brasil y Argentina). Dime si prefieres verlo todo junto, o desglosado por cada país por separado.</li>
+      <li><b>Agregué "Temporalidad" (Actual / Pronóstico)</b> para separar lo que ya está pasando de los forecasts de temporadas futuras (por ahora SS 2027) — así no se mezclan como si fueran el mismo tipo de señal.</li>
+      <li><b>Los datos de búsqueda son de primavera 2026 (hemisferio norte)</b>, mientras casi toda la data de pasarela es otoño-invierno 2026. No son la misma temporada — cuando digo "la pasarela lo dijo y la gente lo busca", el cruce es de categoría (joyería, pañuelos, calzado), no de temporada exacta. Vale la pena tenerlo claro antes de comunicarlo.</li>
+      <li><b>Agrupé "Otro" como fuente</b> para Grazia y los reportes de Colombiamoda porque no tenían una opción propia en la lista — si vas a citarlos seguido, vale la pena darles su propia categoría de fuente.</li>
+      <li><b>El color de cada barra es solo para distinguir categorías</b>, no representa el color real de la prenda — quería confirmar que se lee así y no al revés.</li>
+      <li>Las 3 primeras entradas (cargo pants, rojo cereza, mocasín) fueron ejemplos de arranque del tracker, no parte del análisis LatAm — ¿los dejamos mezclados en el radar general, o los separamos como "capa personal" aparte del "reporte regional"?</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Generado a partir de tu Trend Tracker en Notion.</span>
+    <span>Última actualización: 28 ago 2026 · storytelling de Wikipedia Pageviews</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var rows = [
+    {name:"Mocasín de cuero", cat:["Calzado","Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Vogue Runway", city:"—", region:["Global / sin ciudad"], date:"28 jul 2026", rec:5, link:"https://www.vogue.com/fashion-shows"},
+    {name:"Paleta tierra (musgo, oliva, arena, chocolate)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"México / Medellín", region:["LatAm"], date:"26 ago 2026", rec:5, link:"https://graziamagazine.com/mx/articles/top-7-tendencias-de-moda-este-2026/"},
+    {name:"Volumen y sobretalla — confirmado global", cat:["Silueta"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"México / São Paulo / Milán / Lagos", region:["LatAm","Europa","África"], date:"26 ago 2026", rec:5, link:"https://garotasestupidas.com/5-tendencias-que-vimos-no-sao-paulo-fashion-week-para-voce-usar-ja/"},
+    {name:"Azul luminoso (Color of the Year 2027, Coloro)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Pronóstico", source:"Otro", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:5, link:"https://www.insidefashiondesign.com/post/color-trend-forecast-spring-summer-2027"},
+    {name:"Pantalón cargo oversize", cat:["Silueta","Prenda"], stage:"Calle", temporalidad:"Actual", source:"Street style", city:"Madrid", region:["Europa"], date:"10 ago 2026", rec:4, link:null},
+    {name:"Vintage / segunda mano", cat:["Prenda"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"México / Medellín", region:["LatAm"], date:"26 ago 2026", rec:4, link:"https://www.elpais.com.co/entretenimiento/que-llevar-a-colombiamoda-2026-las-prendas-que-marcaran-tendencia-y-atraeran-todas-las-miradas-2213.html"},
+    {name:"Accesorios statement", cat:["Accesorio"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"México / Medellín", region:["LatAm"], date:"26 ago 2026", rec:4, link:null},
+    {name:"Rojo cereza", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Pinterest Trends", city:"—", region:["Global / sin ciudad"], date:"05 ago 2026", rec:3, link:null},
+    {name:"Transparencias, flecos y metalizados", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"São Paulo", region:["LatAm"], date:"26 ago 2026", rec:3, link:"https://garotasestupidas.com/5-tendencias-que-vimos-no-sao-paulo-fashion-week-para-voce-usar-ja/"},
+    {name:"Cuero y texturas intervenidas (denim, gamuza, capas)", cat:["Textura","Prenda"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Buenos Aires", region:["LatAm"], date:"26 ago 2026", rec:3, link:"https://www.somosohlala.com/moda/bafweek-otono-invierno-2026-comenzo-la-semana-de-la-moda-en-buenos-aires-nid03032026"},
+    {name:"Paleta invierno BAFWEEK (obsidiana, cemento, jade, celadón)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Buenos Aires", region:["LatAm"], date:"26 ago 2026", rec:3, link:"https://www.somosohlala.com/moda/bafweek-otono-invierno-2026-comenzo-la-semana-de-la-moda-en-buenos-aires-nid03032026"},
+    {name:"Sastrería arquitectónica / cortes estructurados", cat:["Silueta"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Buenos Aires", region:["LatAm"], date:"26 ago 2026", rec:3, link:null},
+    {name:"Neutros cálidos ampliados (terracota, arena, café)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Pronóstico", source:"Otro", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:3, link:"https://www.insidefashiondesign.com/post/color-trend-forecast-spring-summer-2027"},
+    {name:"Metálicos como acabado de tela (Lurex, laminado)", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Pronóstico", source:"Otro", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:2, link:"https://www.insidefashiondesign.com/post/color-trend-forecast-spring-summer-2027"},
+    {name:"Cuero y pieles — confirmado global", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Buenos Aires / Milán / París / Londres / Copenhague", region:["LatAm","Europa"], date:"26 ago 2026", rec:5, link:null},
+    {name:"Sastrería masculina en moda femenina — confirmado global", cat:["Accesorio","Silueta"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"México / Milán", region:["LatAm","Europa"], date:"26 ago 2026", rec:5, link:null},
+    {name:"Flecos — confirmado global", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"São Paulo / Nueva York / Lagos", region:["LatAm","Norteamérica","África"], date:"26 ago 2026", rec:5, link:null},
+    {name:"Púrpura real — confirmado Europa", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"París / Londres", region:["Europa"], date:"26 ago 2026", rec:4, link:"https://www.whowhatwear.com/fashion/runway/paris-fashion-week-trends-fall-winter-2026"},
+    {name:"Mostaza y verde menta / seafoam (FW26)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Milán", region:["Europa"], date:"26 ago 2026", rec:3, link:"https://fashionista.com/2026/03/milan-fashion-week-fall-2026-trends"},
+    {name:"Animal print, cuadros y estética grunge (FW26)", cat:["Textura","Prenda"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Nueva York", region:["Norteamérica"], date:"26 ago 2026", rec:3, link:"https://www.refinery29.com/en-us/new-york-fashion-week-fall-winter-2026-trends"},
+    {name:"Cuellos altos isabelinos y siluetas \"full sweep\"", cat:["Silueta"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Londres", region:["Europa"], date:"26 ago 2026", rec:2, link:"https://www.whowhatwear.com/fashion/runway/london-fashion-week-trends-fall-winter-2026"},
+    {name:"Streetwear utilitario-técnico con capas", cat:["Prenda","Silueta"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Tokio", region:["Asia"], date:"26 ago 2026", rec:2, link:"https://hypebeast.com/2026/3/tokyo-fashion-week-fw26-street-style"},
+    {name:"Denim deconstruido — confirmado multicontinental", cat:["Prenda"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Tokio / Lagos", region:["Asia","África"], date:"26 ago 2026", rec:3, link:null},
+    {name:"Paleta neutra estructurada (negro, marrón, beige, caqui)", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Seúl", region:["Asia"], date:"26 ago 2026", rec:3, link:"https://www.koreaherald.com/article/10670387"},
+    {name:"Reconstrucción con materiales alternativos", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Seúl", region:["Asia"], date:"26 ago 2026", rec:2, link:"https://www.koreaherald.com/article/10670387"},
+    {name:"Paleta fría industrial — confirmado 2 continentes", cat:["Color"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Copenhague / Buenos Aires", region:["Europa","LatAm"], date:"26 ago 2026", rec:4, link:"https://fashionista.com/2026/02/copenhagen-fashion-week-fall-2026-trends"},
+    {name:"Calzado práctico (zuecos, botas, bailarinas)", cat:["Calzado"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Copenhague", region:["Europa"], date:"26 ago 2026", rec:2, link:"https://fashionista.com/2026/02/copenhagen-fashion-week-fall-2026-trends"},
+    {name:"Rafia, cuentas sagradas y crochet estructural", cat:["Textura","Accesorio"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Lagos", region:["África"], date:"26 ago 2026", rec:2, link:"https://guzangs.com/what-defined-lagos-fashion-week-ss26-10-trends/"},
+    {name:"Textiles espejados / cuero con espejos", cat:["Textura"], stage:"Pasarela / Industria", temporalidad:"Actual", source:"Otro", city:"Lagos", region:["África"], date:"26 ago 2026", rec:1, link:"https://guzangs.com/what-defined-lagos-fashion-week-ss26-10-trends/"},
+    {name:"Joyería chunky — validado por demanda", cat:["Accesorio"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:5, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Pañuelos de seda — validado por demanda", cat:["Accesorio"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:4, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Calzado plano: ballerinas, Mary Janes, kitten heels", cat:["Calzado"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:4, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Lunares / polka dots — demanda sin pasarela", cat:["Textura","Prenda"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:3, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Encaje", cat:["Textura"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:3, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Pantalón capri / tobillero — demanda sin pasarela", cat:["Prenda","Silueta"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Google Trends", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:2, link:"https://blog.google/products-and-platforms/products/search/spring-2026-fashion-beauty-trends/"},
+    {name:"Balenciaga (empresa) — atención Wikipedia ES", cat:["Prenda"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Wikipedia Pageviews", city:"—", region:["Europa"], date:"26 ago 2026", rec:4, link:null},
+    {name:"Fast fashion / Moda pronta — atención Wikipedia ES", cat:["Prenda"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Wikipedia Pageviews", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:3, link:null},
+    {name:"Streetwear / Y2K / vintage — sin artículo en Wikipedia ES", cat:["Prenda","Textura"], stage:"Retail / Búsqueda", temporalidad:"Actual", source:"Wikipedia Pageviews", city:"—", region:["Global / sin ciudad"], date:"26 ago 2026", rec:2, link:null}
+  ];
+
+  var stageClass = {"Pasarela / Industria":"pasarela","Calle":"calle","Retail / Búsqueda":"calle"};
+  var catColors = {"Color":"#3987e5","Silueta":"#d97706","Textura":"#1baf7a","Prenda":"#d89b1a","Accesorio":"#e0629a","Calzado":"#3fae5c"};
+  var catOrder = ["Color","Silueta","Textura","Prenda","Accesorio","Calzado"];
+  var stageColors = {"Pasarela / Industria":"#3987e5","Calle":"#ff5b93","Retail / Búsqueda":"#3987e5"};
+  var stageOrder = ["Pasarela / Industria","Calle","Retail / Búsqueda"];
+  var regionOrder = ["LatAm","Europa","Norteamérica","Asia","África","Global / sin ciudad"];
+
+  function cityTokens(city){
+    if(!city || city === "—") return [];
+    return city.split(" / ").map(function(s){return s.trim();});
+  }
+
+  // ---- Populate filter dropdowns ----
+  var regionSelect = document.getElementById("filter-region");
+  regionOrder.forEach(function(r){
+    var opt = document.createElement("option"); opt.value = r; opt.textContent = r;
+    regionSelect.appendChild(opt);
+  });
+  var allCities = [];
+  rows.forEach(function(r){ cityTokens(r.city).forEach(function(c){ if(allCities.indexOf(c) === -1) allCities.push(c); }); });
+  allCities.sort(function(a,b){ return a.localeCompare(b, "es"); });
+  var citySelect = document.getElementById("filter-city");
+  allCities.forEach(function(c){
+    var opt = document.createElement("option"); opt.value = c; opt.textContent = c;
+    citySelect.appendChild(opt);
+  });
+
+  var tbody = document.getElementById("table-body");
+  var catEl = document.getElementById("chart-cat");
+  var legendCat = document.getElementById("legend-cat");
+  var stageEl = document.getElementById("chart-stage");
+  var legendStage = document.getElementById("legend-stage");
+  var countNote = document.getElementById("filter-count");
+
+  function render(){
+    var region = regionSelect.value;
+    var city = citySelect.value;
+    var filtered = rows.filter(function(r){
+      var regionOk = region === "Todas" || r.region.indexOf(region) !== -1;
+      var cityOk = city === "Todas" || cityTokens(r.city).indexOf(city) !== -1;
+      return regionOk && cityOk;
+    });
+
+    // Count note
+    if(region === "Todas" && city === "Todas"){
+      countNote.textContent = "Sobre las " + rows.length + " entradas del tracker";
+    } else {
+      countNote.textContent = "Mostrando " + filtered.length + " de " + rows.length + " entradas";
+    }
+
+    // Table
+    tbody.innerHTML = "";
+    filtered.forEach(function(r){
+      var tr = document.createElement("tr");
+      var chips = r.cat.map(function(c){return '<span class="chip">'+c+'</span>';}).join("");
+      var regionChips = r.region.map(function(rg){return '<span class="chip">'+rg+'</span>';}).join("");
+      var pillClass = stageClass[r.stage] || "pasarela";
+      var linkHtml = r.link ? '<a class="src" href="'+r.link+'" target="_blank" rel="noopener">fuente ↗</a>' : '';
+      var tempClass = r.temporalidad === "Pronóstico" ? "pronostico" : "actual";
+      tr.innerHTML =
+        '<td><strong>'+r.name+'</strong>'+(r.link?'<br>'+linkHtml:'')+'</td>'+
+        '<td>'+chips+'</td>'+
+        '<td><span class="pill '+pillClass+'">'+r.stage+'</span></td>'+
+        '<td><span class="pill '+tempClass+'">'+r.temporalidad+'</span></td>'+
+        '<td>'+r.source+'</td>'+
+        '<td>'+regionChips+'</td>'+
+        '<td>'+r.city+'</td>'+
+        '<td class="mono">'+r.date+'</td>'+
+        '<td class="rec"><div class="mini-rec"><div class="track"><i style="width:'+(r.rec/5*100)+'%"></i></div>'+r.rec+'/5</div></td>';
+      tbody.appendChild(tr);
+    });
+
+    // Category chart
+    var catCounts = {};
+    catOrder.forEach(function(c){catCounts[c]=0;});
+    filtered.forEach(function(r){ r.cat.forEach(function(c){ catCounts[c] = (catCounts[c]||0)+1; }); });
+    var maxCat = Math.max.apply(null, Object.values(catCounts).concat([0]));
+    catEl.innerHTML = "";
+    catOrder.forEach(function(c){
+      var n = catCounts[c];
+      var pct = maxCat ? (n/maxCat*100) : 0;
+      var row = document.createElement("div");
+      row.className = "barrow";
+      row.innerHTML = '<span class="blabel">'+c+'</span>'+
+        '<div class="btrack"><div class="bfill" data-tip="'+c+': '+n+' entradas" style="width:'+pct+'%; background:'+catColors[c]+'"></div></div>'+
+        '<span class="bval">'+n+'</span>';
+      catEl.appendChild(row);
+    });
+    legendCat.innerHTML = "";
+    catOrder.forEach(function(c){
+      legendCat.innerHTML += '<span><i style="background:'+catColors[c]+'"></i>'+c+'</span>';
+    });
+
+    // Stage chart
+    var stageCounts = {};
+    stageOrder.forEach(function(s){stageCounts[s]=0;});
+    filtered.forEach(function(r){ stageCounts[r.stage] = (stageCounts[r.stage]||0)+1; });
+    var maxStage = Math.max.apply(null, Object.values(stageCounts).concat([0]));
+    stageEl.innerHTML = "";
+    stageOrder.forEach(function(s){
+      var n = stageCounts[s];
+      var pct = maxStage ? (n/maxStage*100) : 0;
+      var row = document.createElement("div");
+      row.className = "barrow";
+      row.innerHTML = '<span class="blabel">'+s+'</span>'+
+        '<div class="btrack"><div class="bfill" data-tip="'+s+': '+n+' entradas" style="width:'+pct+'%; background:'+stageColors[s]+'"></div></div>'+
+        '<span class="bval">'+n+'</span>';
+      stageEl.appendChild(row);
+    });
+    legendStage.innerHTML = "";
+    stageOrder.forEach(function(s){
+      if(stageCounts[s] > 0){
+        legendStage.innerHTML += '<span><i style="background:'+stageColors[s]+'"></i>'+s+'</span>';
+      }
+    });
+  }
+
+  regionSelect.addEventListener("change", render);
+  citySelect.addEventListener("change", render);
+  document.getElementById("filter-reset").addEventListener("click", function(){
+    regionSelect.value = "Todas"; citySelect.value = "Todas"; render();
+  });
+
+  render();
+})();
+</script>

@@ -1,0 +1,226 @@
+<title>Trend Tracker Privacy Policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --ink: #14161c;
+    --ink-2: #4b4f5b;
+    --ink-muted: #8a8f9c;
+    --rule: #e2e4e9;
+    --accent: #35507a;
+    --accent-soft: rgba(53,80,122,0.08);
+    --accent-rule: rgba(53,80,122,0.28);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #0f1115;
+      --surface: #171a20;
+      --ink: #eef0f4;
+      --ink-2: #c2c6d0;
+      --ink-muted: #82869a;
+      --rule: #2a2e37;
+      --accent: #8fb0dc;
+      --accent-soft: rgba(143,176,220,0.12);
+      --accent-rule: rgba(143,176,220,0.32);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #0f1115; --surface: #171a20; --ink: #eef0f4; --ink-2: #c2c6d0;
+    --ink-muted: #82869a; --rule: #2a2e37; --accent: #8fb0dc;
+    --accent-soft: rgba(143,176,220,0.12); --accent-rule: rgba(143,176,220,0.32);
+    color-scheme: dark;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  .mono{ font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+  .page{
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .eyebrow{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  h1{
+    font-size: clamp(1.9rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0.5rem 0 0.6rem;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    margin-bottom: 2.4rem;
+    padding-bottom: 1.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .meta b{ color: var(--ink-2); font-weight: 500; }
+
+  .tldr{
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-rule);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    margin-bottom: 2.6rem;
+  }
+  .tldr .label{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.55rem;
+  }
+  .tldr p{ margin: 0; color: var(--ink-2); font-size: 0.98rem; max-width: 60ch; }
+
+  section{ margin-bottom: 2.3rem; }
+  .sec-head{
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    margin-bottom: 0.7rem;
+  }
+  .sec-num{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  h2{
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+  }
+  section p, section li{
+    color: var(--ink-2);
+    font-size: 0.98rem;
+    max-width: 62ch;
+  }
+  section ul{ margin: 0.6rem 0; padding-left: 1.3rem; display: flex; flex-direction: column; gap: 0.45rem; }
+  section p{ margin: 0.5rem 0; }
+
+  code{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.87em;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+
+  .contact{
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    margin-top: 2.8rem;
+  }
+  .contact .label{
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .contact a{ color: var(--accent); text-decoration: none; font-weight: 500; }
+  .contact a:hover{ text-decoration: underline; }
+
+  footer{
+    margin-top: 3.5rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.76rem;
+    color: var(--ink-muted);
+  }
+</style>
+
+<div class="page">
+  <span class="eyebrow">Privacy Policy</span>
+  <h1>Trend Tracker — Data Access &amp; Privacy</h1>
+  <div class="meta">
+    <span><b>App:</b> Trend Tracker Moda</span>
+    <span><b>Effective:</b> 2026-08-28</span>
+    <span><b>Contact:</b> josedanielcuelloacademico@gmail.com</span>
+  </div>
+
+  <div class="tldr">
+    <span class="label">In short</span>
+    <p>This app reads aggregate, anonymous trend data from Pinterest's public Trends API (search-volume rankings by keyword and region). It does not access, read, or store any individual's personal Pinterest account, boards, pins, or activity. There is no login system, no user accounts, and no personal data collection of any kind.</p>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>What this app is</h2></div>
+    <p>Trend Tracker Moda is a personal, non-commercial tool built by an individual developer to analyze fashion and lifestyle trend data for their own content and research. It is not a public-facing product, and it is not distributed to other users.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>What data it accesses</h2></div>
+    <p>The app calls the Pinterest Trends API (<code>GET /v5/trends/keywords/{region}/top/{trend_type}</code>) using the <code>ads:read</code> scope. This endpoint returns aggregate, non-personal data:</p>
+    <ul>
+      <li>Trending keywords and their rank within a region</li>
+      <li>Week-over-week, month-over-month, and year-over-year growth percentages</li>
+      <li>A normalized 52-week search-volume time series per keyword</li>
+    </ul>
+    <p>None of this data is tied to an individual Pinterest user, board, or pin.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>What this app does not do</h2></div>
+    <ul>
+      <li>Does not access personal boards, pins, profile information, or activity of any Pinterest user</li>
+      <li>Does not collect names, emails, or any personally identifiable information</li>
+      <li>Does not write, post, or modify anything on Pinterest — access is read-only</li>
+      <li>Does not sell, share, or transfer any data to third parties</li>
+      <li>Does not use cookies, trackers, or analytics on end users, because it has no end users other than its developer</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Data retention</h2></div>
+    <p>Trend keyword data returned by the API may be cached locally by the developer for the purpose of tracking trend changes over time. This cached data is aggregate and non-personal, and is not published or redistributed in raw form.</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Changes to this policy</h2></div>
+    <p>Since this app has a single developer-user and no public distribution, this policy will be updated directly at this URL if the app's use of the API changes.</p>
+  </section>
+
+  <div class="contact">
+    <span class="label">Questions</span>
+    <a href="mailto:josedanielcuelloacademico@gmail.com">josedanielcuelloacademico@gmail.com</a>
+  </div>
+
+  <footer>trend-tracker-moda · privacy-policy.html</footer>
+</div>
