@@ -160,6 +160,34 @@ def obtener_entradas(url: str) -> list[dict]:
     return parsed.entries
 
 
+def cargar_entradas_precargadas(path: str) -> list[tuple[str, str, dict]]:
+    """Carga entradas ya obtenidas por fuera de este script (ej. un agente en
+    la nube que las trajo con WebFetch porque el fetch directo por red está
+    bloqueado por la política del entorno). Formato esperado: JSON, lista de
+    objetos {"fuente_feed": ..., "titulo": ..., "resumen": ... (opcional),
+    "link": ..., "fecha": ...}. "fuente_feed" debe ser una de las claves de
+    FEEDS (Vogue, Hypebeast, Highsnobiety, Dazed, "Business of Fashion", WWD)
+    para poder resolver la "Fuente" de Notion correspondiente."""
+    nombre_a_fuente_notion = {nombre: fuente for (nombre, fuente) in FEEDS.values()}
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    entradas_totales = []
+    conteo_por_fuente: Counter[str] = Counter()
+    for item in data:
+        nombre_feed = item["fuente_feed"]
+        fuente_notion = nombre_a_fuente_notion.get(nombre_feed, "Otro")
+        entrada = {
+            "title": item.get("titulo", ""),
+            "summary": item.get("resumen", ""),
+            "link": item.get("link"),
+            "published": item.get("fecha", "sin fecha"),
+        }
+        entradas_totales.append((nombre_feed, fuente_notion, entrada))
+        conteo_por_fuente[nombre_feed] += 1
+    for nombre_feed, n in conteo_por_fuente.items():
+        print(f"{nombre_feed}: {n} entradas cargadas (precargadas, no fetch directo)")
+    return entradas_totales
+
+
 def _tokenizar(texto: str) -> list[str]:
     tokens = _TOKEN_RE.findall(texto.lower())
     return [t for t in tokens if len(t) >= LONGITUD_MIN_TOKEN and t not in STOPWORDS]
@@ -169,18 +197,24 @@ def _ngramas(tokens: list[str], n: int) -> list[str]:
     return [" ".join(tokens[i : i + n]) for i in range(len(tokens) - n + 1)]
 
 
-def escanear() -> dict[str, dict]:
+def escanear(entradas_json_path: str | None = None) -> dict[str, dict]:
     """Mina 1-gramas y 2-gramas de todas las entradas, cuenta en cuántas
     entradas/fuentes distintas aparece cada uno, y filtra boilerplate por
-    frecuencia de documento. Devuelve {termino: {menciones: [...], df: int}}."""
+    frecuencia de documento. Devuelve {termino: {menciones: [...], df: int}}.
+
+    Si `entradas_json_path` se da, usa esas entradas precargadas en vez de
+    ir a buscarlas por red (ver `cargar_entradas_precargadas`)."""
     existentes = cargar_tendencias_existentes()
 
-    entradas_totales = []
-    for url, (nombre_feed, fuente_notion) in FEEDS.items():
-        entradas = obtener_entradas(url)
-        print(f"{nombre_feed}: {len(entradas)} entradas revisadas")
-        for entrada in entradas:
-            entradas_totales.append((nombre_feed, fuente_notion, entrada))
+    if entradas_json_path:
+        entradas_totales = cargar_entradas_precargadas(entradas_json_path)
+    else:
+        entradas_totales = []
+        for url, (nombre_feed, fuente_notion) in FEEDS.items():
+            entradas = obtener_entradas(url)
+            print(f"{nombre_feed}: {len(entradas)} entradas revisadas")
+            for entrada in entradas:
+                entradas_totales.append((nombre_feed, fuente_notion, entrada))
 
     n_entradas = len(entradas_totales)
     if n_entradas == 0:
@@ -277,7 +311,18 @@ def reportar(hallazgos: dict[str, dict]) -> None:
 
 
 if __name__ == "__main__":
-    hallazgos = escanear()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--entries-file",
+        help="JSON con entradas precargadas (ver cargar_entradas_precargadas) — "
+        "úsalo cuando el fetch directo por red esté bloqueado, ej. en un "
+        "entorno con política de red restrictiva.",
+    )
+    args = parser.parse_args()
+
+    hallazgos = escanear(entradas_json_path=args.entries_file)
     reportar(hallazgos)
 
     hoy = date.today().isoformat()
